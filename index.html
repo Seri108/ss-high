@@ -1,0 +1,1310 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>2026 남이섬 교직원 연수 스마트 가이드 &amp; 플레이</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Pretendard', '-apple-system', 'sans-serif'],
+                    },
+                    colors: {
+                        forest: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            200: '#bbf7d0',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            800: '#166534',
+                            900: '#14532d',
+                            950: '#052e16'
+                        },
+                        gold: {
+                            50: '#fffbeb',
+                            100: '#fef3c7',
+                            500: '#f59e0b',
+                            600: '#d97706',
+                            700: '#b45309'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        body {
+            font-family: 'Pretendard', sans-serif;
+            background: radial-gradient(circle at 20% 20%, #f0fdf4 0%, #e2e8f0 100%);
+            color: #0f172a;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+            margin: 0;
+            padding: 0;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 5px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 9999px;
+        }
+        .option-card {
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .option-card:hover {
+            transform: translateY(-2px);
+        }
+        .option-card:active {
+            transform: scale(0.98);
+        }
+        .modal-anim {
+            animation: modalPop 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        @keyframes modalPop {
+            from { opacity: 0; transform: translateY(16px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        
+        #app {
+            width: 100vw;
+            height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            background: rgba(255, 255, 255, 0.98);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            position: relative;
+            overflow: hidden;
+        }
+        @media (min-width: 1024px) {
+            body {
+                padding: 1.5rem;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                min-height: 100vh;
+            }
+            #app {
+                width: 100%;
+                max-width: 1360px;
+                aspect-ratio: 16 / 9;
+                height: auto;
+                max-height: 90vh;
+                border-radius: 1.5rem;
+                border: 1px solid rgba(226, 232, 240, 0.9);
+            }
+        }
+
+        .app-screen {
+            display: none !important;
+        }
+        .app-screen.is-active {
+            display: flex !important;
+            flex-direction: column;
+            flex: 1 1 0%;
+        }
+
+        .modal-layer {
+            display: none;
+        }
+        .modal-layer.is-open {
+            display: flex !important;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+
+    <!-- MAIN APP CONTAINER -->
+    <div id="app">
+
+        <!-- Top Header (With [처음으로] button on left and Date Badge on right) -->
+        <header class="bg-forest-900 text-white px-4 sm:px-5 py-3 flex justify-between items-center z-20 shrink-0 border-b border-forest-800 shadow-md">
+            <div class="flex items-center space-x-3">
+                <button type="button" onclick="goHome()" class="flex items-center gap-1.5 bg-forest-800 hover:bg-forest-700 active:scale-95 border border-forest-700 px-3 py-1.5 rounded-xl transition cursor-pointer shadow-xs">
+                    <i class="fa-solid fa-house text-gold-500 text-xs"></i>
+                    <span class="text-xs font-extrabold text-slate-100">처음으로</span>
+                </button>
+
+                <div class="cursor-pointer flex items-center gap-2.5" onclick="goHome()">
+                    <div class="w-8 h-8 rounded-xl bg-forest-800 border border-forest-700 flex items-center justify-center shadow-inner hidden sm:flex">
+                        <i class="fa-solid fa-tree text-gold-500 text-sm"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="font-extrabold text-sm sm:text-base tracking-tight text-slate-100">2026 남이섬 교직원 연수</span>
+                            <span class="hidden md:inline-block px-2 py-0.5 rounded-full bg-forest-800 text-gold-500 text-[10px] font-bold border border-forest-700">스마트 가이드</span>
+                        </div>
+                        <span class="text-[11px] text-forest-200 font-medium hidden sm:block">삼성고등학교 전 교직원 역량강화 &amp; 힐링 워크숍</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-2">
+                <span class="text-xs font-bold text-gold-500 bg-forest-800/90 border border-forest-700/80 px-3 py-1.5 rounded-xl shadow-xs flex items-center gap-1.5">
+                    <i class="fa-regular fa-calendar-check text-gold-500"></i>
+                    <span>2026.10.12 (월)</span>
+                </span>
+            </div>
+        </header>
+
+        <!-- Body Layout (Sidebar on PC + Interactive Main on Right) -->
+        <div class="flex-1 flex flex-col lg:flex-row overflow-hidden relative">
+
+            <!-- PC Left Sidebar Panel -->
+            <aside class="hidden lg:flex w-80 bg-slate-50/95 border-r border-slate-200 p-5 flex-col justify-between shrink-0 overflow-y-auto custom-scrollbar">
+                <div>
+                    <div class="flex items-center justify-between mb-3.5 pb-2 border-b border-slate-200">
+                        <span class="text-xs font-black text-slate-700 flex items-center gap-1.5 uppercase tracking-wider">
+                            <i class="fa-solid fa-route text-forest-700"></i> 주요 일정표
+                        </span>
+                        <span class="text-[10px] bg-forest-100 text-forest-800 font-extrabold px-2 py-0.5 rounded-md">2026.10.12(월)</span>
+                    </div>
+
+                    <div class="space-y-2.5 text-xs">
+                        <div class="p-2.5 bg-white rounded-xl border border-slate-200 shadow-xs">
+                            <div class="flex items-center justify-between text-forest-800 font-black mb-0.5">
+                                <span><i class="fa-solid fa-bus mr-1 text-forest-600"></i> 학교 출발</span>
+                                <span class="text-[11px] text-slate-500">11:00 ~ 12:30</span>
+                            </div>
+                            <p class="text-slate-600 text-[11px]">신림중 앞 버스정류장 (1·2호차 탑승)</p>
+                        </div>
+
+                        <div class="p-2.5 bg-white rounded-xl border border-slate-200 shadow-xs">
+                            <div class="flex items-center justify-between text-forest-800 font-black mb-0.5">
+                                <span><i class="fa-solid fa-utensils mr-1 text-amber-600"></i> 점심 식사</span>
+                                <span class="text-[11px] text-slate-500">12:30 ~ 13:30</span>
+                            </div>
+                            <p class="text-slate-600 text-[11px]">가평 명물닭갈비 (1인 2.5~3만원 예산)</p>
+                        </div>
+
+                        <div class="p-2.5 bg-white rounded-xl border border-slate-200 shadow-xs">
+                            <div class="flex items-center justify-between text-forest-800 font-black mb-0.5">
+                                <span><i class="fa-solid fa-camera mr-1 text-sky-600"></i> 하선 &amp; 단체사진</span>
+                                <span class="text-[11px] text-slate-500">13:30 ~ 14:00</span>
+                            </div>
+                            <p class="text-slate-600 text-[11px]">가평 선착장 ➔ 남이섬 선착장 (기념촬영)</p>
+                        </div>
+
+                        <div class="p-2.5 bg-white rounded-xl border border-slate-200 shadow-xs">
+                            <div class="flex items-center justify-between text-forest-800 font-black mb-0.5">
+                                <span><i class="fa-solid fa-person-walking mr-1 text-emerald-600"></i> 자율활동 &amp; 3355</span>
+                                <span class="text-[11px] text-slate-500">14:00 ~ 16:45</span>
+                            </div>
+                            <p class="text-slate-600 text-[11px]">생태탐방, 부서협의회 (1인 17,000원 지원)</p>
+                        </div>
+
+                        <div class="p-2.5 bg-amber-50 rounded-xl border border-amber-200 shadow-xs">
+                            <div class="flex items-center justify-between text-amber-900 font-black mb-0.5">
+                                <span><i class="fa-solid fa-ship mr-1 text-amber-600"></i> 복귀선 탑승</span>
+                                <span class="text-[11px] text-amber-700 font-extrabold">16:45 엄수!</span>
+                            </div>
+                            <p class="text-amber-800 text-[11px]">남이나루 선착장 집결 (17:00 인원점검 및 귀교)</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sidebar QR Code and Emergency Contact -->
+                <div class="mt-3 pt-3 border-t border-slate-200">
+                    <div class="bg-white p-3 rounded-2xl border border-slate-200 shadow-xs flex items-center gap-3">
+                        <div class="relative cursor-pointer group shrink-0 qr-trigger" onclick="openQrModal()" title="클릭하여 QR 크게보기">
+                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=https%3A%2F%2Fapp.notion.com%2Fp%2F_-3e795920bf1d808990fccd8c57019c93%3Fsource%3Dcopy_link" onerror="this.src='qrcode.png';" class="w-14 h-14 rounded-lg border border-slate-200 group-hover:scale-105 transition shadow-xs object-cover bg-white" alt="연수 상세정보 QR">
+                            <span class="absolute -bottom-1 -right-1 bg-forest-800 text-white rounded-full w-4 h-4 flex items-center justify-center text-[9px] shadow-xs">
+                                <i class="fa-solid fa-magnifying-glass-plus"></i>
+                            </span>
+                        </div>
+                        <div class="text-[11px] overflow-hidden flex-1">
+                            <span class="font-extrabold text-slate-800 block truncate">스마트 가이드 QR</span>
+                            <a href="https://app.notion.com/p/_-3e795920bf1d808990fccd8c57019c93?source=copy_link" target="_blank" rel="noopener noreferrer" class="text-forest-700 hover:text-forest-900 font-bold flex items-center gap-1.5 mt-1 text-[11px] hover:underline bg-forest-50 p-1.5 rounded-lg border border-forest-200/80 transition">
+                                <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+                                <span class="truncate">웹페이지 바로가기</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Main Content Interactive Workspace -->
+            <main class="flex-1 overflow-y-auto custom-scrollbar p-4 sm:p-6 flex flex-col justify-between bg-white/60 backdrop-blur-xs relative" id="mainContainer">
+
+                <!-- SCREEN 1: HOME MODE SELECTION SCREEN -->
+                <div id="homeScreen" class="app-screen is-active justify-between">
+                    <div>
+                        <div class="text-center max-w-xl mx-auto mb-4">
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-forest-100 text-forest-800 font-bold text-xs mb-2.5 border border-forest-200 shadow-xs">
+                                🍁 가평·남이섬 교직원 현장연수 가이드
+                            </span>
+                            <h1 class="text-xl sm:text-2xl lg:text-3xl font-black text-slate-900 leading-snug tracking-tight">
+                                선생님, 즐거운 게임으로<br class="hidden sm:inline">
+                                <span class="text-forest-700">남이섬 연수 수칙 완전 정복!</span>
+                            </h1>
+                            <p class="text-xs sm:text-sm text-slate-500 mt-1.5">원하시는 놀이 모드를 선택하여 수칙을 숙지하고 나의 유형을 확인해보세요.</p>
+                        </div>
+
+                        <!-- Game Mode Selector Cards -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 max-w-2xl mx-auto my-2">
+                            <!-- Mode 1: MBTI Test -->
+                            <button onclick="startMode('mbti')" class="option-card bg-white hover:bg-forest-50/60 p-4 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-between h-36 relative overflow-hidden group text-left cursor-pointer">
+                                <div class="absolute -right-3 -bottom-3 text-forest-600/10 group-hover:text-forest-600/20 transition text-7xl">
+                                    <i class="fa-solid fa-id-card"></i>
+                                </div>
+                                <span class="bg-forest-100 text-forest-800 text-[11px] font-extrabold px-2.5 py-0.5 rounded-md w-max border border-forest-200">8문항 • 케미분석</span>
+                                <div>
+                                    <div class="font-extrabold text-base mb-1 flex items-center gap-1.5 text-slate-900">
+                                        <span>연수 MBTI 검사</span>
+                                        <i class="fa-solid fa-chevron-right text-xs text-forest-600"></i>
+                                    </div>
+                                    <p class="text-xs text-slate-500 line-clamp-2">나의 연수 행동 캐릭터와 케미 유형을 완벽 분석!</p>
+                                </div>
+                            </button>
+
+                            <!-- Mode 2: Balance Game -->
+                            <button onclick="startMode('balance')" class="option-card bg-white hover:bg-amber-50/60 p-4 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-between h-36 relative overflow-hidden group text-left cursor-pointer">
+                                <div class="absolute -right-3 -bottom-3 text-gold-600/10 group-hover:text-gold-600/20 transition text-7xl">
+                                    <i class="fa-solid fa-scale-balanced"></i>
+                                </div>
+                                <span class="bg-gold-100 text-gold-700 text-[11px] font-extrabold px-2.5 py-0.5 rounded-md w-max border border-gold-200">8문항 • A vs B</span>
+                                <div>
+                                    <div class="font-extrabold text-base mb-1 flex items-center gap-1.5 text-slate-900">
+                                        <span>서바이벌 밸런스</span>
+                                        <i class="fa-solid fa-chevron-right text-xs text-gold-600"></i>
+                                    </div>
+                                    <p class="text-xs text-slate-500 line-clamp-2">닭갈비 vs 막국수! 극한의 연수 선택 놀이</p>
+                                </div>
+                            </button>
+
+                            <!-- Mode 3: Simple Quiz -->
+                            <button onclick="startMode('quiz')" class="option-card bg-white hover:bg-forest-50/60 p-4 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-between h-36 relative overflow-hidden group text-left cursor-pointer">
+                                <div class="absolute -right-3 -bottom-3 text-forest-600/10 group-hover:text-forest-600/20 transition text-7xl">
+                                    <i class="fa-solid fa-circle-question"></i>
+                                </div>
+                                <span class="bg-forest-100 text-forest-800 text-[11px] font-extrabold px-2.5 py-0.5 rounded-md w-max border border-forest-200">8문항 • 점수 산출</span>
+                                <div>
+                                    <div class="font-extrabold text-base mb-1 flex items-center gap-1.5 text-slate-900">
+                                        <span>핵심 정보 퀴즈</span>
+                                        <i class="fa-solid fa-chevron-right text-xs text-forest-600"></i>
+                                    </div>
+                                    <p class="text-xs text-slate-500 line-clamp-2">예산/안전/일정 필수 규정 점수 마스터!</p>
+                                </div>
+                            </button>
+
+                            <!-- Mode 4: Ideal Type World Cup -->
+                            <button onclick="startMode('worldcup')" class="option-card bg-white hover:bg-amber-50/60 p-4 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-between h-36 relative overflow-hidden group text-left cursor-pointer">
+                                <div class="absolute -right-3 -bottom-3 text-gold-600/10 group-hover:text-gold-600/20 transition text-7xl">
+                                    <i class="fa-solid fa-trophy"></i>
+                                </div>
+                                <span class="bg-gold-100 text-gold-700 text-[11px] font-extrabold px-2.5 py-0.5 rounded-md w-max border border-gold-200">8강 • 토너먼트</span>
+                                <div>
+                                    <div class="font-extrabold text-base mb-1 flex items-center gap-1.5 text-slate-900">
+                                        <span>남이섬 힐링 월드컵</span>
+                                        <i class="fa-solid fa-chevron-right text-xs text-gold-600"></i>
+                                    </div>
+                                    <p class="text-xs text-slate-500 line-clamp-2">내가 뽑는 남이섬 최고의 힐링 스팟!</p>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Bottom Action Footer Button -->
+                    <div class="max-w-2xl mx-auto w-full pt-3">
+                        <button onclick="openInfoModal()" class="w-full bg-forest-50 hover:bg-forest-100 text-forest-900 border border-forest-200 p-3.5 rounded-2xl flex items-center justify-between text-xs sm:text-sm font-bold transition shadow-xs cursor-pointer">
+                            <div class="flex items-center gap-2.5">
+                                <i class="fa-solid fa-book-open-reader text-forest-700 text-lg"></i>
+                                <span>남이섬 연수 일정 · 안전 · 예산 핵심 요약표 보기</span>
+                            </div>
+                            <i class="fa-solid fa-arrow-right text-forest-700"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- SCREEN 2: GAMEPLAY SCREEN (MBTI / BALANCE / QUIZ) -->
+                <div id="gameScreen" class="app-screen justify-between max-w-2xl mx-auto w-full">
+                    <div>
+                        <!-- Progress Bar Header -->
+                        <div class="mb-4">
+                            <div class="flex justify-between items-center text-xs sm:text-sm font-bold text-slate-600 mb-2">
+                                <span id="gameModeBadge" class="text-forest-800 font-extrabold flex items-center gap-1.5">
+                                    <i class="fa-solid fa-gamepad"></i> 연수 MBTI 검사
+                                </span>
+                                <span id="gameProgressCounter" class="bg-forest-100 text-forest-800 px-2.5 py-0.5 rounded-md text-xs font-black">Q1 / 8</span>
+                            </div>
+                            <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden p-0.5 border border-slate-200">
+                                <div id="gameProgressBar" class="bg-forest-600 h-full w-[12.5%] rounded-full transition-all duration-300"></div>
+                            </div>
+                        </div>
+
+                        <!-- Question Card -->
+                        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 mb-4 relative">
+                            <div class="flex items-center gap-1.5 mb-2.5">
+                                <span id="qBadge" class="text-xs font-extrabold px-3 py-1 rounded-md bg-forest-50 text-forest-800 border border-forest-200">
+                                    🚗 출발 &amp; 이동
+                                </span>
+                            </div>
+                            <h2 id="qText" class="text-base sm:text-lg font-black text-slate-900 leading-snug">
+                                질문 내용이 표시됩니다.
+                            </h2>
+                        </div>
+
+                        <!-- Options Container -->
+                        <div id="gameOptionsContainer" class="space-y-3">
+                            <!-- Dynamically Injected Buttons -->
+                        </div>
+                    </div>
+
+                    <!-- Footer Info Helper -->
+                    <div class="mt-4 text-center">
+                        <p id="gameFooterTip" class="text-xs text-slate-500 flex items-center justify-center gap-1.5 font-medium">
+                            <i class="fa-solid fa-circle-info text-gold-500"></i> 선택에 따른 결과 및 상세 수칙 설명이 연동됩니다.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- SCREEN 3: WORLDCUP GAME SCREEN -->
+                <div id="worldcupScreen" class="app-screen justify-between max-w-2xl mx-auto w-full">
+                    <div>
+                        <div class="text-center mb-4">
+                            <span id="worldcupRoundText" class="bg-forest-100 text-forest-800 px-3.5 py-1 rounded-full text-xs font-black border border-forest-200">
+                                🏆 남이섬 힐링 월드컵 (8강)
+                            </span>
+                            <h2 class="text-base sm:text-lg font-black text-slate-800 mt-2">더 끌리는 남이섬 힐링 코스를 선택하세요!</h2>
+                        </div>
+
+                        <div class="grid grid-cols-1 gap-4">
+                            <!-- Candidate A -->
+                            <button id="wcBtnA" onclick="selectWorldcupCandidate(0)" class="option-card bg-white hover:bg-forest-50/60 p-5 rounded-2xl shadow-sm border border-slate-200 hover:border-forest-500 flex items-center gap-4 transition text-left cursor-pointer">
+                                <div id="wcIconA" class="w-14 h-14 rounded-2xl bg-forest-600 text-white flex items-center justify-center text-3xl shrink-0 shadow-xs">
+                                    🍁
+                                </div>
+                                <div>
+                                    <span class="text-xs font-extrabold text-forest-700 block mb-0.5">선택지 A</span>
+                                    <h3 id="wcTitleA" class="text-base font-black text-slate-900 leading-tight">메타세쿼이아길 단풍 인생샷</h3>
+                                    <p id="wcDescA" class="text-xs text-slate-500 mt-1">가을 단풍 아래에서 부서원들과 인생샷 찍기</p>
+                                </div>
+                            </button>
+
+                            <div class="text-center font-black text-sm text-gold-600 my-[-6px] relative z-10">VS</div>
+
+                            <!-- Candidate B -->
+                            <button id="wcBtnB" onclick="selectWorldcupCandidate(1)" class="option-card bg-white hover:bg-gold-50/60 p-5 rounded-2xl shadow-sm border border-slate-200 hover:border-gold-500 flex items-center gap-4 transition text-left cursor-pointer">
+                                <div id="wcIconB" class="w-14 h-14 rounded-2xl bg-gold-500 text-white flex items-center justify-center text-3xl shrink-0 shadow-xs">
+                                    ☕
+                                </div>
+                                <div>
+                                    <span class="text-xs font-extrabold text-gold-700 block mb-0.5">선택지 B</span>
+                                    <h3 id="wcTitleB" class="text-base font-black text-slate-900 leading-tight">북한강 뷰 스윙카페 커피</h3>
+                                    <p id="wcDescB" class="text-xs text-slate-500 mt-1">강변 카페에 앉아 따뜻한 커피와 빵 힐링</p>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <button onclick="goHome()" class="w-full py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold mt-4 transition cursor-pointer">
+                        처음으로 돌아가기
+                    </button>
+                </div>
+
+                <!-- SCREEN 4: RESULT SCREEN -->
+                <div id="resultScreen" class="app-screen justify-between max-w-2xl mx-auto w-full">
+                    <div>
+                        <div class="text-center mb-3">
+                            <span id="resultBadge" class="text-xs font-extrabold text-forest-800 bg-forest-100 px-3.5 py-1 rounded-full border border-forest-200">
+                                🎉 검사 결과 발표
+                            </span>
+                            <h2 id="resultMainTitle" class="text-xl sm:text-2xl font-black text-slate-900 mt-1.5">나의 연수 결과 카드</h2>
+                        </div>
+
+                        <!-- Result Card -->
+                        <div id="resultCard" class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 relative overflow-hidden mb-3">
+                            <div id="resultCardHeader" class="p-4 -m-5 mb-4 bg-forest-900 text-white rounded-t-2xl flex justify-between items-center shadow-xs">
+                                <div>
+                                    <span id="resultSubCode" class="text-xs font-mono font-bold text-gold-500 block">ESTJ형</span>
+                                    <h3 id="resultCardTitle" class="text-lg sm:text-xl font-black leading-tight">걸어 다니는 연구부장</h3>
+                                </div>
+                                <div id="resultIconBox" class="w-11 h-11 rounded-xl bg-white/10 flex items-center justify-center text-2xl text-gold-500 backdrop-blur-xs">
+                                    <i class="fa-solid fa-clipboard-check"></i>
+                                </div>
+                            </div>
+
+                            <!-- Score / Stat Bar -->
+                            <div id="resultStatBox" class="flex items-center justify-between text-xs sm:text-sm py-2.5 border-b border-slate-100">
+                                <span id="resultStatLabel" class="text-slate-500 font-medium">안전 &amp; 규칙 지수</span>
+                                <div class="flex items-center gap-2 font-bold text-forest-800">
+                                    <div class="w-28 bg-slate-100 rounded-full h-2.5">
+                                        <div id="resultScoreBar" class="bg-forest-600 h-2.5 rounded-full w-full"></div>
+                                    </div>
+                                    <span id="resultScoreText">100%</span>
+                                </div>
+                            </div>
+
+                            <!-- Detailed Description -->
+                            <div class="my-3 space-y-1.5">
+                                <div class="text-xs sm:text-sm font-extrabold text-slate-700 flex items-center gap-1.5">
+                                    <i class="fa-solid fa-star text-gold-500"></i> 주요 특징 및 행동
+                                </div>
+                                <p id="resultCardDesc" class="text-xs sm:text-sm text-slate-600 leading-relaxed bg-slate-50 p-3 rounded-xl border border-slate-100">
+                                    설명 내용이 출력됩니다.
+                                </p>
+                            </div>
+
+                            <!-- Advice / Tip Box -->
+                            <div id="resultAdviceBox" class="bg-forest-50 p-3 rounded-xl border border-forest-100 text-xs sm:text-sm text-forest-900">
+                                <span class="font-extrabold block mb-0.5 text-forest-800"><i class="fa-solid fa-heart-pulse mr-1"></i>추천 연수 역할</span>
+                                <span id="resultAdviceText">팀 내 총무 및 안전반장 역할에 최적화!</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="space-y-2.5 pt-2">
+                        <button onclick="shareResult()" class="w-full py-3.5 bg-forest-800 hover:bg-forest-900 text-white text-xs sm:text-sm font-bold rounded-xl shadow-xs flex items-center justify-center space-x-2 transition cursor-pointer active:scale-98">
+                            <i class="fa-solid fa-share-nodes"></i>
+                            <span>결과 단톡방에 공유하기</span>
+                        </button>
+                        <button onclick="goHome()" class="w-full py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs sm:text-sm font-bold rounded-xl transition flex items-center justify-center space-x-1.5 cursor-pointer">
+                            <i class="fa-solid fa-house"></i>
+                            <span>메인 화면으로 돌아가기</span>
+                        </button>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+
+        <!-- MODAL 1: EXPLANATION / TIP MODAL -->
+        <div id="tipModal" class="modal-layer fixed inset-0 z-50 items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-900/60 backdrop-blur-xs">
+            <div class="bg-white w-full max-w-lg rounded-t-3xl sm:rounded-2xl p-5 shadow-2xl modal-anim border-t sm:border border-slate-200 max-h-[85vh] overflow-y-auto">
+                <div class="flex justify-between items-start mb-3">
+                    <div id="tipModalBadge" class="text-xs font-black px-3 py-1 rounded-full bg-forest-100 text-forest-800 flex items-center gap-1.5 border border-forest-200">
+                        <i class="fa-solid fa-circle-check text-forest-600"></i> 선택 완료 &amp; 연수 팁
+                    </div>
+                    <button onclick="closeTipModal()" class="text-slate-400 hover:text-slate-600 text-2xl font-bold px-2 py-0.5 cursor-pointer">
+                        &times;
+                    </button>
+                </div>
+
+                <div id="selectedChoiceText" class="text-xs sm:text-sm font-semibold text-slate-700 mb-3 p-3 bg-slate-50 rounded-xl border border-slate-100">
+                    선택한 항목 내용
+                </div>
+
+                <div class="bg-gold-50 rounded-xl p-4 border border-gold-200 mb-4">
+                    <div class="text-xs sm:text-sm font-extrabold text-gold-900 mb-1 flex items-center gap-1.5">
+                        <i class="fa-solid fa-lightbulb text-gold-600 text-base"></i>
+                        <span>알아두면 유용한 연수 핵심 수칙</span>
+                    </div>
+                    <p id="tipExplanationText" class="text-xs sm:text-sm text-gold-950 font-medium leading-relaxed">
+                        핵심 해설 내용이 표시됩니다.
+                    </p>
+                </div>
+
+                <button onclick="nextStep()" class="w-full py-3.5 bg-forest-800 hover:bg-forest-900 text-white font-bold text-xs sm:text-sm rounded-xl shadow-xs transition flex items-center justify-center gap-1.5 cursor-pointer">
+                    <span>다음 단계로 넘어가기</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- MODAL 2: FIELD TRIP CHEAT SHEET (연수 정보) -->
+        <div id="infoModal" class="modal-layer fixed inset-0 z-50 items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
+            <div class="bg-white w-full max-w-lg rounded-2xl p-5 shadow-2xl modal-anim max-h-[85vh] flex flex-col border border-slate-200">
+                <div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-100">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-lg bg-forest-800 text-white flex items-center justify-center text-sm">
+                            <i class="fa-solid fa-book-bookmark"></i>
+                        </div>
+                        <h3 class="font-extrabold text-base text-slate-900">남이섬 연수 핵심 정보 요약</h3>
+                    </div>
+                    <button onclick="closeInfoModal()" class="text-slate-400 hover:text-slate-600 text-2xl font-bold px-2 py-0.5 cursor-pointer">
+                        &times;
+                    </button>
+                </div>
+
+                <!-- Scrollable Rules List -->
+                <div class="flex-1 overflow-y-auto custom-scrollbar space-y-3 pr-1 text-xs sm:text-sm">
+
+                    <!-- Mobile Schedule View -->
+                    <div class="block lg:hidden bg-forest-50/70 p-3.5 rounded-xl border border-forest-200">
+                        <div class="font-extrabold text-forest-900 mb-1.5 flex items-center gap-1.5">
+                            <i class="fa-solid fa-clock text-forest-700"></i> 주요 일정 안내 (2026.10.12)
+                        </div>
+                        <ul class="space-y-1 text-slate-700 text-xs">
+                            <li>• <strong>11:00:</strong> 신림중 앞 출발 (1·2호차 탑승)</li>
+                            <li>• <strong>12:30:</strong> 가평 명물닭갈비 점심 식사</li>
+                            <li>• <strong>13:30:</strong> 남이섬 도항선 탑승 &amp; 단체사진</li>
+                            <li>• <strong>14:00:</strong> 생태탐방 및 부서협의회</li>
+                            <li>• <strong class="text-amber-800 font-bold">16:45:</strong> 남이나루 선착장 집결 (엄수!)</li>
+                        </ul>
+                    </div>
+
+                    <!-- Emergency Phone & Medical -->
+                    <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+                        <div class="font-extrabold text-slate-800 mb-1.5 flex items-center gap-1.5">
+                            <i class="fa-solid fa-phone-volume text-forest-600"></i> 비상 연락 &amp; 응급 기관
+                        </div>
+                        <ul class="space-y-1 text-slate-600 text-xs">
+                            <li>• <strong>가평군 보건소:</strong> <a href="tel:031-582-2488" class="text-forest-700 font-bold underline">031-582-2488</a></li>
+                            <li>• <strong>가평중앙약국:</strong> 031-581-7522</li>
+                            <li>• <strong>도로공사 콜센터:</strong> <a href="tel:1588-2504" class="text-forest-700 font-bold underline">1588-2504</a></li>
+                            <li class="text-amber-800 font-bold mt-1">* 이상상황 발생 시 안전반장/연구부장 즉시 보고!</li>
+                        </ul>
+                    </div>
+
+                    <!-- Budget & Cards -->
+                    <div class="bg-gold-50/80 p-3.5 rounded-xl border border-gold-200">
+                        <div class="font-extrabold text-gold-900 mb-1.5 flex items-center gap-1.5">
+                            <i class="fa-solid fa-credit-card text-gold-600"></i> 예산 &amp; 카드 사용 규칙
+                        </div>
+                        <ul class="space-y-1 text-slate-700 text-xs">
+                            <li>• <strong>주차장:</strong> 카카오 모빌리티 <u>카드 전용 결제</u> (기본 6,000원)</li>
+                            <li>• <strong>점심 닭갈비:</strong> 1인당 25,000원 ~ 30,000원 이내</li>
+                            <li>• <strong>섬 액티비티:</strong> 1만 원 한도의 예산 (자전거 대여 시 <strong>신분증</strong> 필수!)</li>
+                            <li>• <strong>부서 협의회비:</strong> 1인 17,000원 (<u>남이섬 섬 내 식당·카페만 가능</u>, 🚨 <strong>기념품샵 구매 불가</strong>, 외부 이월 불가)</li>
+                        </ul>
+                    </div>
+
+                    <!-- 3355 Photo Mission -->
+                    <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+                        <div class="font-extrabold text-slate-800 mb-1.5 flex items-center gap-1.5">
+                            <i class="fa-solid fa-trophy text-gold-500"></i> 3355 사진 콘테스트 (총 35만 원 상당)
+                        </div>
+                        <ul class="space-y-1 text-slate-600 text-xs">
+                            <li>• 3~5인 소그룹 단체 사진 + <strong class="text-slate-800">센스 있는 '제목'</strong> 제출!</li>
+                            <li>• 1등: 20만 원 식사권 / 2등: 15만 원 식사권</li>
+                        </ul>
+                    </div>
+
+                </div>
+
+                <div class="mt-4 pt-3 border-t border-slate-100">
+                    <button onclick="closeInfoModal()" class="w-full py-3 bg-forest-800 hover:bg-forest-900 text-white font-bold text-xs sm:text-sm rounded-xl shadow-xs cursor-pointer">
+                        확인 완료 (닫기)
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL 3: QR CODE ENLARGED LIGHTBOX MODAL -->
+        <div id="qrModal" class="modal-layer fixed inset-0 z-50 items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
+            <div class="bg-white w-full max-w-sm rounded-2xl p-6 shadow-2xl modal-anim text-center border border-slate-200">
+                <div class="flex justify-between items-center mb-3">
+                    <h3 class="font-extrabold text-sm text-slate-900">스마트 가이드 QR 코드</h3>
+                    <button onclick="closeQrModal()" class="text-slate-400 hover:text-slate-600 text-2xl font-bold px-2 py-0.5 cursor-pointer">
+                        &times;
+                    </button>
+                </div>
+                <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 inline-block my-2">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https%3A%2F%2Fapp.notion.com%2Fp%2F_-3e795920bf1d808990fccd8c57019c93%3Fsource%3Dcopy_link" onerror="this.src='qrcode.png';" class="w-48 h-48 rounded-xl object-cover bg-white shadow-xs mx-auto" alt="연수 상세 QR">
+                </div>
+                <p class="text-xs text-slate-500 mt-1 mb-3">스마트폰 카메라로 스캔하거나 아래 링크를 눌러 페이지로 이동하세요!</p>
+                
+                <a href="https://app.notion.com/p/_-3e795920bf1d808990fccd8c57019c93?source=copy_link" target="_blank" rel="noopener noreferrer" class="w-full py-2.5 bg-forest-800 hover:bg-forest-900 text-white font-bold text-xs rounded-xl transition flex items-center justify-center gap-1.5 shadow-xs mb-2">
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                    <span>노션 웹페이지 바로가기</span>
+                </a>
+
+                <button onclick="closeQrModal()" class="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl cursor-pointer">
+                    닫기
+                </button>
+            </div>
+        </div>
+
+        <footer class="bg-slate-50 px-5 py-2.5 text-center text-[11px] text-slate-400 border-t border-slate-200 shrink-0">
+            2026 삼성고등학교 교직원 현장연수 스마트 가이드 • 남이섬 워크숍
+        </footer>
+
+    </div>
+
+    <script>
+        /* WEB AUDIO SYNTHESIZER */
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playSound(type) {
+            try {
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                if (type === 'click') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(450, audioCtx.currentTime);
+                    gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.07);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.07);
+                } else if (type === 'correct') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(523.25, audioCtx.currentTime);
+                    osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.08);
+                    gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.22);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.22);
+                } else if (type === 'finish') {
+                    const now = audioCtx.currentTime;
+                    [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
+                        const o = audioCtx.createOscillator();
+                        const g = audioCtx.createGain();
+                        o.connect(g);
+                        g.connect(audioCtx.destination);
+                        o.frequency.setValueAtTime(freq, now + idx * 0.07);
+                        g.gain.setValueAtTime(0.1, now + idx * 0.07);
+                        g.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.07 + 0.3);
+                        o.start(now + idx * 0.07);
+                        o.stop(now + idx * 0.07 + 0.3);
+                    });
+                }
+            } catch (e) {
+                console.log('Audio playback error:', e);
+            }
+        }
+
+        /* DATA SET 1: MBTI TEST QUESTIONS */
+        const mbtiQuestions = [
+            {
+                badge: "🚗 섹션 1: 주차 & 카드",
+                question: "Q1. 자차로 남이섬 선착장에 도착한 나! 주차 정산소 앞에서의 올바른 행동은?",
+                tip: "남이섬 주차장은 카카오 모빌리티 시스템으로 운영되어 **카드 결제만 가능**하며 입차 시 차량 등록이 필수입니다!",
+                options: [
+                    { text: "A. 쿨하게 카드를 꺼내 탭한다. (카카오 모빌리티라 카드 결제만 가능!)", mbti: "ESTJ", safety: true },
+                    { text: "B. 옛날 감성으로 \"삼촌, 잔돈 안 남겨주셔도 돼요~\"하며 현금을 건넨다.", mbti: "ISFP", safety: false },
+                    { text: "C. 기본 6시간 요금(6,000원) 아까우니 5시간 59분에 칼같이 나갈 준비를 한다.", mbti: "ENTP", safety: false },
+                    { text: "D. 돌발상황 발생 시 도로공사 콜센터 대신 교장선생님께 먼저 SOS를 친다.", mbti: "ENFP", safety: false }
+                ]
+            },
+            {
+                badge: "🚌 섹션 1: 버스 탑승",
+                question: "Q2. 버스 출발 직전! 안전의 달인인 나의 첫 번째 행동은?",
+                tip: "탑승 직후 **전원 안전벨트 착용은 의무**! 비상 탈출 망치와 소화기 위치까지 확인하는 것이 명품 안전 수칙입니다.",
+                options: [
+                    { text: "A. 탑승하자마자 안전벨트를 매고 비상망치/소화기 위치를 매의 눈으로 스캔한다.", mbti: "ESTJ", safety: true },
+                    { text: "B. 기사님께 은밀하게 다가가 음주측정기 대신 숙취해소제를 건넨다.", mbti: "ESFP", safety: false },
+                    { text: "C. \"선생님, 11시 출발인데 저 지금 일어났어요\" 단톡방에 모닝콜을 날린다.", mbti: "ENFP", safety: false },
+                    { text: "D. 이동 중 복도에 서서 반모임 브리핑을 시작한다.", mbti: "ENTP", safety: false }
+                ]
+            },
+            {
+                badge: "🍗 섹션 2: 닭갈비 대전",
+                question: "Q3. 닭갈비 집에서 1인당 예산은 30,000원! 우리 테이블의 주문 전략은?",
+                tip: "1인당 점심 예산(25,000원 ~ 30,000원) 범위 내에서 메뉴를 구성해야 합니다.",
+                options: [
+                    { text: "A. [실속파] 닭갈비+막국수+감자전+볶음밥으로 3만 원 딱 맞춰 영양 조합 완벽 구성!", mbti: "ESTJ", safety: true },
+                    { text: "B. [탄수화물 폭격기] 고기는 핑계일 뿐. 날치알 볶음밥으로 산을 쌓는다.", mbti: "ISFP", safety: true },
+                    { text: "C. [회식 고수] \"옆 테이블 도토리묵이랑 우리 파전 반반 트레이드 하실 분!\"", mbti: "ESFP", safety: true },
+                    { text: "D. [예산 초과러] 사리 10개 추가하고 나몰라라 한다.", mbti: "ENFP", safety: false }
+                ]
+            },
+            {
+                badge: "🚲 섹션 3: 액티비티 예산",
+                question: "Q4. 섬 내 이동수단을 고를 때 당신의 선택은? (1만 원 한도의 예산)",
+                tip: "자전거 대여 시 **신분증 제출 필수**! 1만 원 한도의 예산 초과분은 본인 부담입니다.",
+                options: [
+                    { text: "A. [바람의 파이터] 바이크센터에 신분증 맡기고 싱글자전거 1시간 폭풍 질주!", mbti: "ENTP", safety: true },
+                    { text: "B. [낭만 힐링파] 편안하게 나눔열차(4,000원) 타며 옛 추억 소환하고 감상 모드.", mbti: "ISFP", safety: true },
+                    { text: "C. [안락함 추구파] 스토리투어버스(10,000원 예산에 딱 맞춤)로 20분간 편하게 한 바퀴 순회.", mbti: "ESTJ", safety: true },
+                    { text: "D. [욕망의 폭주] 전기자전거 빌려 타고 30분 초과되어 피 같은 자비로 결제하기.", mbti: "ENFP", safety: false }
+                ]
+            },
+            {
+                badge: "🏥 섹션 3: 응급 대처",
+                question: "Q5. 남이섬에서 갑자기 넘어져 무릎이 까졌거나 배탈이 났다! 가장 올바른 대처는?",
+                tip: "가평군보건소(031-582-2488) 및 인근 약국 정보(가평중앙약국: 031-581-7522)를 파악하고, 총괄 책임자에게 즉시 보고해야 합니다.",
+                options: [
+                    { text: "A. 인근 보건의료기관 정보(가평보건소/약국)를 확인하고 관리자에게 즉시 보고한다.", mbti: "ESTJ", safety: true },
+                    { text: "B. 남이섬 타조와 눈싸움을 하며 아픔을 정신력으로 잊어본다.", mbti: "ENTP", safety: false },
+                    { text: "C. 강물에 발을 담그고 자연치유 및 혈자리를 지압한다.", mbti: "ISFP", safety: false },
+                    { text: "D. 3355 단톡방에 무릎 피나는 셀카를 올리고 좋아요를 기다린다.", mbti: "ESFP", safety: false }
+                ]
+            },
+            {
+                badge: "☕ 섹션 4: 부서 협의회",
+                question: "Q6. 부서 협의회 법인카드(1인 17,000원) 사용 규칙 중 잘못 알고 있는 선생님은?",
+                tip: "협의회비 17,000원은 **'남이섬 섬 내 식당 및 카페'**에서만 사용 가능합니다! (기념품샵 구매 불가, 외부 이월 및 학교 앞 사용 불가능)",
+                options: [
+                    { text: "A. [A 교사] \"스윙카페 베이커리에서 빵이랑 북한강 뷰 커피 마셔요!\" (가능)", mbti: "ISFP", safety: true },
+                    { text: "B. [B 교사] \"소나타카페 가서 눈사람호떡빙수 부서원 다 같이 먹어요.\" (가능)", mbti: "ESFP", safety: true },
+                    { text: "C. [C 교사] \"17,000원 남겨서 학교 앞 치킨집에서 2차로 쓰죠!\" (🚨 규칙 위반)", mbti: "ENFP", safety: false },
+                    { text: "D. [D 교사] \"티하우스 차담에서 디저트 먹으며 의견을 나눕니다.\" (가능)", mbti: "ESTJ", safety: true }
+                ]
+            },
+            {
+                badge: "📸 섹션 5: 3355 프로젝트",
+                question: "Q7. 1등 20만원 식사권이 걸린 3355 사진 콘테스트! 우리 팀의 출품작 작명 전략은?",
+                tip: "3~5인 소그룹 단체 사진에 **센스 있는 '제목'**을 꼭 달아 제출하셔야 심사 대상이 됩니다!",
+                options: [
+                    { text: "A. [감성 문학파] \"가을, 은행잎, 그리고 고교학점제... 찬란한 고민\" 제목으로 출품!", mbti: "ISFP", safety: true },
+                    { text: "B. [현실 격공파] \"월요일 출장에 지친 자들의 필사적인 미소.jpg\"", mbti: "ESTJ", safety: true },
+                    { text: "C. [취향저격파] \"삼성고의 미래를 밝히는 4인의 어벤져스\"", mbti: "ENFP", safety: true },
+                    { text: "D. [미제출 배짱파] \"상금은 양보한다. 오직 자유를 찍는다\" (제출 안 함)", mbti: "ENTP", safety: false }
+                ]
+            },
+            {
+                badge: "⏰ 섹션 6: 복귀 & 집결",
+                question: "Q8. 시계 바늘이 16시 40분을 가리키고 있다. 당신의 발걸음이 향해야 할 곳은?",
+                tip: "16:45 남이나루 선착장 집결(16:45 배 탑승)! 17:00 가평 선착장 인원점검 후 복귀합니다.",
+                options: [
+                    { text: "A. 남이나루 선착장 집결지로 전력 질주! (16:45 배 놓치면 섬에 갇힌다!)", mbti: "ESTJ", safety: true },
+                    { text: "B. \"단풍이 예쁜걸...\" 정관루 호텔 정원 구석에 텐트를 친다.", mbti: "ISFP", safety: false },
+                    { text: "C. 나 혼자 15시에 개인 요트 부르고 조기 퇴근했다.", mbti: "ENTP", safety: false },
+                    { text: "D. 17:00 인원 점검 때 다른 사람 등 뒤에 숨어 분신술을 쓴다.", mbti: "ENFP", safety: false }
+                ]
+            }
+        ];
+
+        /* DATA SET 2: BALANCE GAME QUESTIONS */
+        const balanceQuestions = [
+            {
+                badge: "🍗 닭갈비 밸런스",
+                question: "점심 식사 메뉴! 나의 영혼을 끌어당기는 맛은?",
+                tip: "1인당 25,000원 ~ 30,000원 예산 범위 내에서 맛있는 음식을 선택해보세요!",
+                options: [
+                    { text: "A. 푸짐한 양 양배추 가득 '철판 닭갈비 + 날치알 볶음밥'", type: "A" },
+                    { text: "B. 숯불 향 그윽한 '숯불 닭갈비 + 시원한 쟁반 막국수'", type: "B" }
+                ]
+            },
+            {
+                badge: "🚲 이동수단 밸런스",
+                question: "섬 안에서 자유시간을 보내는 나의 스타일은?",
+                tip: "자전거는 신분증 제출 필수, 스토리투어버스는 10,000원 한도의 예산에 딱 맞습니다.",
+                options: [
+                    { text: "A. 바람을 가르며 남이섬 한 바퀴 '자전거 라이딩'", type: "A" },
+                    { text: "B. 편안하게 앉아서 안내 들으며 '스토리 투어버스'", type: "B" }
+                ]
+            },
+            {
+                badge: "🚌 연수 버스 밸런스",
+                question: "연수 버스 탑승 시 내가 선호하는 좌석 위치는?",
+                tip: "탑승 시 전원 안전벨트 착용은 의무입니다!",
+                options: [
+                    { text: "A. 버스 기사님 옆자리에 앉아 차량 안전을 진두지휘한다.", type: "A" },
+                    { text: "B. 안락한 자리에 차분하게 앉아 창밖을 보며 이동한다.", type: "B" }
+                ]
+            },
+            {
+                badge: "📸 3355 콘테스트 밸런스",
+                question: "상금 20만 원이 걸린 3355 단체사진 찍을 때 나의 포즈는?",
+                tip: "3~5인 그룹과 함께 센스 있는 제목을 달아 제출하면 1등 20만원 식사권!",
+                options: [
+                    { text: "A. 1등을 노리는 파격적인 '장난끼 넘치는 / 짤방 패러디 포즈'", type: "A" },
+                    { text: "B. 단풍 배경의 따스하고 훈훈한 '인스타 감성 힐링 포즈'", type: "B" }
+                ]
+            },
+            {
+                badge: "☕ 카페 힐링 밸런스",
+                question: "1인 17,000원 부서 협의회비로 디저트를 즐길 때 내 Pick은?",
+                tip: "협의회비는 남이섬 섬 내 식당 및 카페에서만 사용 가능합니다.",
+                options: [
+                    { text: "A. 소나타카페 '눈사람 호떡 & 달콤한 빙수'", type: "A" },
+                    { text: "B. 스윙카페 '북한강 통창 뷰 + 아메리카노 & 갓 구운 베이커리'", type: "B" }
+                ]
+            },
+            {
+                badge: "⏰ 집결 슬라이딩 밸런스",
+                question: "16시 45분 배를 타기 위한 선착장 도착 스타일은?",
+                tip: "16:45 남이나루 선착장 집결 시 시각을 꼭 지켜주셔야 합니다.",
+                options: [
+                    { text: "A. 16시 30분부터 선착장에서 1등으로 줄 서서 기다리는 FM파", type: "A" },
+                    { text: "B. 16시 44분에 슬라이딩으로 배에 탑승하는 스릴파", type: "B" }
+                ]
+            },
+            {
+                badge: "💳 예산 사용 규칙 밸런스",
+                question: "부서 협의회비(1인 17,000원) 예산 사용 시 주의해야 할 사항은?",
+                tip: "부서 협의회비는 남이섬 섬 내 식당 및 카페에서만 사용 가능하며, 기념품샵 사용 및 외부 이월은 불가능합니다.",
+                options: [
+                    { text: "A. 남이섬 섬 내 카페나 식당에서 맛있는 디저트/식사로 즐겁게 사용하기", type: "A" },
+                    { text: "B. 기념품샵에서 굿즈나 캐릭터 상품 구매하기 (🚨 기념품샵 결제 불가!)", type: "B" }
+                ]
+            },
+            {
+                badge: "🍻 복귀 후 밸런스",
+                question: "17:00 가평 도착 후 연수가 끝난 뒤 나의 희망사항은?",
+                tip: "무사히 일정을 마치고 안전하게 귀가하는 것이 최우선입니다!",
+                options: [
+                    { text: "A. 부서원들과 맛있는 2차 저녁 회식 이어가기", type: "A" },
+                    { text: "B. 칼같이 집으로 직행하여 소파와 물아일체 휴식", type: "B" }
+                ]
+            }
+        ];
+
+        /* DATA SET 3: SIMPLE QUIZ QUESTIONS */
+        const quizQuestions = [
+            {
+                badge: "🚗 주차 규칙",
+                question: "Q1. 남이섬 주차 정산소에서는 현금 결제가 가능하다?",
+                options: [
+                    { text: "O (현금/카드 모두 가능)", isCorrect: false },
+                    { text: "X (카카오 모빌리티 시스템이라 카드 결제만 가능)", isCorrect: true }
+                ],
+                tip: "남이섬 주차장은 **카카오 모빌리티 카드 결제 전용**입니다!"
+            },
+            {
+                badge: "🚲 자전거 대여",
+                question: "Q2. 남이섬 바이크센터에서 자전거를 대여할 때 꼭 제출해야 하는 것은?",
+                options: [
+                    { text: "교직원증", isCorrect: false },
+                    { text: "신분증 (주민등록증/운전면허증)", isCorrect: true },
+                    { text: "학급 명부", isCorrect: false },
+                    { text: "명함", isCorrect: false }
+                ],
+                tip: "자전거 대여 시 **신분증 지참 및 제출**이 필수입니다."
+            },
+            {
+                badge: "💳 예산 사용 장소",
+                question: "Q3. 부서 협의회비 (1인 17,000원)의 사용 규칙으로 옳은 것은?",
+                options: [
+                    { text: "남이섬 기념품샵에서 캐릭터 굿즈 구매", isCorrect: false },
+                    { text: "가평 휴게소 맛집 이용", isCorrect: false },
+                    { text: "남이섬 섬 내 식당 및 카페 이용 (기념품샵 불가)", isCorrect: true },
+                    { text: "학교 앞 치킨집에서 이월 사용", isCorrect: false }
+                ],
+                tip: "협의회비는 오직 **'남이섬 섬 내 식당 및 카페'**에서만 사용할 수 있습니다 (기념품샵 결제 불가)."
+            },
+            {
+                badge: "📞 비상 연락망",
+                question: "Q4. 남이섬 연수 중 돌발 응급환자 발생 시 가평군 보건소 전화번호는?",
+                options: [
+                    { text: "031-582-2488", isCorrect: true },
+                    { text: "1588-2504", isCorrect: false },
+                    { text: "02-120", isCorrect: false },
+                    { text: "114", isCorrect: false }
+                ],
+                tip: "가평군 보건소 번호는 **031-582-2488** 입니다."
+            },
+            {
+                badge: "⏰ 집결 시각",
+                question: "Q5. 남이나루 선착장에 집결하여 배를 타야 하는 정확한 시각은?",
+                options: [
+                    { text: "16:00", isCorrect: false },
+                    { text: "16:30", isCorrect: false },
+                    { text: "16:45", isCorrect: true },
+                    { text: "17:30", isCorrect: false }
+                ],
+                tip: "**16:45 남이나루 선착장** 집결 및 배 탑승을 준수해야 합니다!"
+            },
+            {
+                badge: "📸 3355 콘테스트",
+                question: "Q6. 3355 사진 콘테스트 1등 팀에게 수여되는 식사권 금액은?",
+                options: [
+                    { text: "5만 원", isCorrect: false },
+                    { text: "10만 원", isCorrect: false },
+                    { text: "20만 원", isCorrect: true },
+                    { text: "50만 원", isCorrect: false }
+                ],
+                tip: "1등 20만 원, 2등 15만 원 상당의 식사권이 지급됩니다!"
+            },
+            {
+                badge: "🚌 차량 안전",
+                question: "Q7. 연수 버스 탑승 직후 가장 먼저 실천해야 하는 안전 행동은?",
+                options: [
+                    { text: "핸드폰 충전기 꽂기", isCorrect: false },
+                    { text: "전원 안전벨트 착용", isCorrect: true },
+                    { text: "간식 나누어 먹기", isCorrect: false },
+                    { text: "수면 안대 쓰기", isCorrect: false }
+                ],
+                tip: "버스 탑승 즉시 **전원 안전벨트 착용**이 필수 수칙입니다."
+            },
+            {
+                badge: "💵 액티비티 예산",
+                question: "Q8. 섬 내 스토리투어버스/자전거 이용 시 설정된 개인별 예산 한도는?",
+                options: [
+                    { text: "5,000원", isCorrect: false },
+                    { text: "10,000원 한도의 예산", isCorrect: true },
+                    { text: "20,000원", isCorrect: false },
+                    { text: "무제한", isCorrect: false }
+                ],
+                tip: "1인당 **10,000원 한도의 예산** 내에서 사용하며 초과금은 자비 부담입니다."
+            }
+        ];
+
+        /* DATA SET 4: WORLDCUP CANDIDATES */
+        const worldcupCandidates = [
+            { id: 1, name: "메타세쿼이아길 단풍 인생샷", icon: "🍁", desc: "가을 단풍 아래에서 부서원들과 인생샷" },
+            { id: 2, name: "북한강 뷰 스윙카페 커피", icon: "☕", desc: "강변 카페에 앉아 따뜻한 커피와 빵 힐링" },
+            { id: 3, name: "바이크센터 자전거 라이딩", icon: "🚲", desc: "신분증 맡기고 바람을 가르는 자전거" },
+            { id: 4, name: "편안한 스토리 투어버스", icon: "🚌", desc: "가이드 안내와 함께 편안한 섬 한 바퀴" },
+            { id: 5, name: "가평 명물 닭갈비 & 막국수", icon: "🍗", desc: "지글지글 철판/숯불 닭갈비 먹방" },
+            { id: 6, name: "소나타카페 눈사람 호떡", icon: "⛄", desc: "달콤한 눈사람 모양 호떡과 빙수" },
+            { id: 7, name: "3355 콘테스트 단체샷", icon: "📸", desc: "20만원 식사권을 향한 유쾌한 사진전" },
+            { id: 8, name: "정관루 한옥 정원 산책", icon: "🏡", desc: "고즈넉한 한옥 정원의 가을 풍경" }
+        ];
+
+        /* MBTI PERSONAS DEFINITION */
+        const personas = {
+            "ESTJ": {
+                code: "ESTJ형",
+                title: "걸어 다니는 연구부장",
+                icon: "fa-clipboard-check",
+                desc: "안전벨트 1초 컷! 16시 40분 선착장 맨 앞 대기! 예산 칼맞춤. 선생님이 계시기에 이번 연수는 단 한 건의 사고도 없이 완벽합니다.",
+                role: "팀 내 '안전 반장' 및 '예산 총괄 수호신'"
+            },
+            "ENFP": {
+                code: "ENFP형",
+                title: "3355 포토제닉 헌터",
+                icon: "fa-camera-retro",
+                desc: "사진만 300장 찰칵! 1등 상금(20만 원)은 이미 우리 부서 것! 넘치는 인싸력과 유머 감각으로 연수 분위기를 책임집니다.",
+                role: "연수 단톡방 분위기 메이커 & 3355 연출 감독"
+            },
+            "ISFP": {
+                code: "ISFP형",
+                title: "리버뷰 물멍 베이커리 요정",
+                icon: "fa-mug-hot",
+                desc: "자전거는 힘들어요... 스윙카페 북한강 통창 명당 잡고 2시간째 따뜻한 라떼 마시며 감성 충전 중인 평화주의자.",
+                role: "지친 동료 교사의 마음을 어루만지는 힐링 요정"
+            },
+            "ENTP": {
+                code: "ENTP형",
+                title: "자전거 폭주 기관차",
+                icon: "fa-bicycle",
+                desc: "1만 원 한도의 예산을 받아 신분증 맡긴 뒤 남이섬 끝에서 끝까지 레이싱! 호기심과 에너지가 넘치는 액티비티 마스터.",
+                role: "남이섬 구석구석 숨은 꿀스팟 탐험 대장"
+            },
+            "ESFP": {
+                code: "ESFP형",
+                title: "닭갈비 파전 트레이더",
+                icon: "fa-utensils",
+                desc: "\"옆 테이블 도토리묵이랑 파전 반반 협상하실 분?\" 먹는 것에 진심이며 회식 자리에서 가장 빛나는 먹방 에이스.",
+                role: "부서별 맛집 구성 및 영양 균형 조율사"
+            }
+        };
+
+        /* STATE CONTROL VARIABLES */
+        let currentMode = 'mbti';
+        let currentQIndex = 0;
+        let mbtiScores = { ESTJ: 0, ENFP: 0, ISFP: 0, ENTP: 0, ESFP: 0 };
+        let safetyScore = 0;
+        let quizCorrectCount = 0;
+        let selectedOptionTemp = null;
+
+        let wcRoundList = [];
+        let wcNextRoundList = [];
+        let wcMatchIndex = 0;
+
+        /* SCREEN SWITCHING HELPER */
+        function switchScreen(screenId) {
+            document.querySelectorAll('.app-screen').forEach(s => s.classList.remove('is-active'));
+            const target = document.getElementById(screenId);
+            if (target) target.classList.add('is-active');
+        }
+
+        function goHome() {
+            playSound('click');
+            switchScreen('homeScreen');
+        }
+
+        function startMode(mode) {
+            playSound('click');
+            currentMode = mode;
+            currentQIndex = 0;
+            mbtiScores = { ESTJ: 0, ENFP: 0, ISFP: 0, ENTP: 0, ESFP: 0 };
+            safetyScore = 0;
+            quizCorrectCount = 0;
+
+            if (mode === 'worldcup') {
+                initWorldcup();
+            } else {
+                switchScreen('gameScreen');
+                renderGameQuestion();
+            }
+        }
+
+        /* GAME QUESTION RENDERER */
+        function renderGameQuestion() {
+            let dataSet = [];
+            let modeTitle = "";
+
+            if (currentMode === 'mbti') {
+                dataSet = mbtiQuestions;
+                modeTitle = `<i class="fa-solid fa-id-card text-forest-600"></i> 연수 MBTI 검사`;
+            } else if (currentMode === 'balance') {
+                dataSet = balanceQuestions;
+                modeTitle = `<i class="fa-solid fa-scale-balanced text-gold-600"></i> 서바이벌 밸런스`;
+            } else if (currentMode === 'quiz') {
+                dataSet = quizQuestions;
+                modeTitle = `<i class="fa-solid fa-circle-question text-forest-600"></i> 핵심 정보 퀴즈`;
+            }
+
+            const q = dataSet[currentQIndex];
+
+            // Header Updates
+            document.getElementById('gameModeBadge').innerHTML = modeTitle;
+            document.getElementById('gameProgressCounter').innerText = `Q${currentQIndex + 1} / ${dataSet.length}`;
+            const percent = ((currentQIndex + 1) / dataSet.length) * 100;
+            document.getElementById('gameProgressBar').style.width = `${percent}%`;
+
+            // Question Card
+            document.getElementById('qBadge').innerText = q.badge;
+            document.getElementById('qText').innerText = q.question;
+
+            // Options Container
+            const container = document.getElementById('gameOptionsContainer');
+            container.innerHTML = '';
+
+            q.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = "option-card w-full text-left p-4 rounded-xl border border-slate-200 bg-white hover:border-forest-500 hover:bg-forest-50/50 shadow-xs flex items-start space-x-3 text-xs sm:text-sm text-slate-800 font-semibold leading-relaxed cursor-pointer";
+                btn.onclick = () => selectGameOption(opt, q);
+
+                const optionLabel = String.fromCharCode(65 + idx);
+                btn.innerHTML = `
+                    <span class="w-6 h-6 rounded-lg bg-forest-100 text-forest-800 font-black text-xs flex items-center justify-center shrink-0 mt-0.5 border border-forest-200">
+                        ${optionLabel}
+                    </span>
+                    <span class="flex-1">${opt.text}</span>
+                `;
+                container.appendChild(btn);
+            });
+        }
+
+        function selectGameOption(option, question) {
+            playSound('correct');
+            selectedOptionTemp = option;
+
+            if (currentMode === 'mbti') {
+                if (mbtiScores[option.mbti] !== undefined) mbtiScores[option.mbti]++;
+                if (option.safety) safetyScore++;
+            } else if (currentMode === 'quiz') {
+                if (option.isCorrect) quizCorrectCount++;
+            }
+
+            // Display Explanation Modal
+            document.getElementById('selectedChoiceText').innerHTML = `
+                <span class="font-bold text-slate-700">선택한 답변:</span> ${option.text}
+            `;
+            document.getElementById('tipExplanationText').innerHTML = question.tip;
+            document.getElementById('tipModal').classList.add('is-open');
+        }
+
+        function closeTipModal() {
+            playSound('click');
+            document.getElementById('tipModal').classList.remove('is-open');
+        }
+
+        function nextStep() {
+            closeTipModal();
+            currentQIndex++;
+
+            let dataSet = (currentMode === 'mbti') ? mbtiQuestions : (currentMode === 'balance') ? balanceQuestions : quizQuestions;
+
+            if (currentQIndex < dataSet.length) {
+                renderGameQuestion();
+            } else {
+                finishGame();
+            }
+        }
+
+        /* WORLDCUP TOURNAMENT LOGIC */
+        function initWorldcup() {
+            switchScreen('worldcupScreen');
+            wcRoundList = [...worldcupCandidates].sort(() => Math.random() - 0.5);
+            wcNextRoundList = [];
+            wcMatchIndex = 0;
+            renderWorldcupMatch();
+        }
+
+        function renderWorldcupMatch() {
+            const roundName = wcRoundList.length === 8 ? "8강" : wcRoundList.length === 4 ? "준결승 (4강)" : "결승전";
+            document.getElementById('worldcupRoundText').innerText = `🏆 남이섬 힐링 월드컵 (${roundName} - ${wcMatchIndex + 1}/${wcRoundList.length / 2})`;
+
+            const candA = wcRoundList[wcMatchIndex * 2];
+            const candB = wcRoundList[wcMatchIndex * 2 + 1];
+
+            document.getElementById('wcIconA').innerText = candA.icon;
+            document.getElementById('wcTitleA').innerText = candA.name;
+            document.getElementById('wcDescA').innerText = candA.desc;
+
+            document.getElementById('wcIconB').innerText = candB.icon;
+            document.getElementById('wcTitleB').innerText = candB.name;
+            document.getElementById('wcDescB').innerText = candB.desc;
+        }
+
+        function selectWorldcupCandidate(choiceIdx) {
+            playSound('correct');
+            const winner = wcRoundList[wcMatchIndex * 2 + choiceIdx];
+            wcNextRoundList.push(winner);
+
+            wcMatchIndex++;
+
+            if (wcMatchIndex * 2 >= wcRoundList.length) {
+                if (wcNextRoundList.length === 1) {
+                    finishWorldcup(wcNextRoundList[0]);
+                } else {
+                    wcRoundList = [...wcNextRoundList];
+                    wcNextRoundList = [];
+                    wcMatchIndex = 0;
+                    renderWorldcupMatch();
+                }
+            } else {
+                renderWorldcupMatch();
+            }
+        }
+
+        function finishWorldcup(winner) {
+            playSound('finish');
+            try { confetti({ particleCount: 90, spread: 70, origin: { y: 0.6 } }); } catch (e) {}
+
+            switchScreen('resultScreen');
+
+            document.getElementById('resultBadge').innerText = "🏆 이상형 월드컵 우승!";
+            document.getElementById('resultMainTitle').innerText = "내가 선택한 남이섬 최고 힐링";
+
+            document.getElementById('resultSubCode').innerText = "1위 힐링 스팟";
+            document.getElementById('resultCardTitle').innerText = `${winner.icon} ${winner.name}`;
+            document.getElementById('resultCardDesc').innerText = winner.desc;
+
+            document.getElementById('resultStatLabel').innerText = "선호 만족도";
+            document.getElementById('resultScoreText').innerText = "100%";
+            document.getElementById('resultScoreBar').style.width = "100%";
+
+            document.getElementById('resultAdviceText').innerText = `이번 연수에서 ${winner.name} 코스를 꼭 즐겨보세요!`;
+            document.getElementById('resultIconBox').innerHTML = winner.icon;
+        }
+
+        /* GAME COMPLETION & SCORING LOGIC */
+        function finishGame() {
+            playSound('finish');
+            try { confetti({ particleCount: 90, spread: 70, origin: { y: 0.6 } }); } catch (e) {}
+
+            switchScreen('resultScreen');
+
+            if (currentMode === 'mbti') {
+                let maxMbti = "ESTJ";
+                let maxVal = -1;
+                for (const [key, val] of Object.entries(mbtiScores)) {
+                    if (val > maxVal) { maxVal = val; maxMbti = key; }
+                }
+
+                const p = personas[maxMbti] || personas["ESTJ"];
+                const safetyPct = Math.round((safetyScore / mbtiQuestions.length) * 100);
+
+                document.getElementById('resultBadge').innerText = "🎉 연수 MBTI 유형 분석 완료";
+                document.getElementById('resultMainTitle').innerText = "나의 연수 캐릭터 카드";
+
+                document.getElementById('resultSubCode').innerText = p.code;
+                document.getElementById('resultCardTitle').innerText = p.title;
+                document.getElementById('resultCardDesc').innerText = p.desc;
+                document.getElementById('resultAdviceText').innerText = p.role;
+                document.getElementById('resultIconBox').innerHTML = `<i class="fa-solid ${p.icon}"></i>`;
+
+                document.getElementById('resultStatLabel').innerText = "안전 & 규칙 지수";
+                document.getElementById('resultScoreText').innerText = `${safetyPct}%`;
+                document.getElementById('resultScoreBar').style.width = `${safetyPct}%`;
+
+            } else if (currentMode === 'balance') {
+                document.getElementById('resultBadge').innerText = "⚖️ 밸런스 게임 완료";
+                document.getElementById('resultMainTitle').innerText = "취향저격 연수 가이드";
+
+                document.getElementById('resultSubCode').innerText = "BALANCE TYPE";
+                document.getElementById('resultCardTitle').innerText = "자유로운 연수 감성파";
+                document.getElementById('resultCardDesc').innerText = "선생님의 독창적인 선택들로 채워진 연수! 기본 수칙만 잘 지키면 남이섬 최고의 추억을 만드실 수 있습니다.";
+                document.getElementById('resultAdviceText').innerText = "동료 교사들과 서로의 밸런스 선택을 공유해보세요!";
+                document.getElementById('resultIconBox').innerHTML = `<i class="fa-solid fa-scale-balanced"></i>`;
+
+                document.getElementById('resultStatLabel').innerText = "취향 매칭도";
+                document.getElementById('resultScoreText').innerText = "100%";
+                document.getElementById('resultScoreBar').style.width = "100%";
+
+            } else if (currentMode === 'quiz') {
+                const scorePct = Math.round((quizCorrectCount / quizQuestions.length) * 100);
+
+                document.getElementById('resultBadge').innerText = "📝 핵심 정보 퀴즈 채점 완료";
+                document.getElementById('resultMainTitle').innerText = `내 연수 정보 점수: ${scorePct}점!`;
+
+                document.getElementById('resultSubCode').innerText = `맞힌 문제: ${quizCorrectCount} / ${quizQuestions.length}`;
+                
+                if (scorePct >= 80) {
+                    document.getElementById('resultCardTitle').innerText = "🥇 남이섬 연수 박사급 선생님";
+                    document.getElementById('resultCardDesc').innerText = "축하합니다! 연수 일정, 안전 수칙, 예산 규칙을 완벽하게 마스터하셨습니다. 팀원들을 이끄는 명품 가이드로 활약해보세요!";
+                } else {
+                    document.getElementById('resultCardTitle').innerText = "🥈 연수 수칙 열공 필요 교사";
+                    document.getElementById('resultCardDesc').innerText = "아쉽게 몇 문제를 놓치셨어요! 하단 요약표 버튼을 눌러 출발 전 필수 규칙을 한 번 더 점검해보세요!";
+                }
+
+                document.getElementById('resultAdviceText').innerText = "하단 [요약표 보기] 버튼을 누르면 언제든 요약표를 볼 수 있습니다.";
+                document.getElementById('resultIconBox').innerHTML = `<i class="fa-solid fa-award"></i>`;
+
+                document.getElementById('resultStatLabel').innerText = "수칙 이해도";
+                document.getElementById('resultScoreText').innerText = `${scorePct}%`;
+                document.getElementById('resultScoreBar').style.width = `${scorePct}%`;
+            }
+        }
+
+        /* MODAL AND SHARING UTILITIES */
+        function openInfoModal() {
+            playSound('click');
+            document.getElementById('infoModal').classList.add('is-open');
+        }
+
+        function closeInfoModal() {
+            playSound('click');
+            document.getElementById('infoModal').classList.remove('is-open');
+        }
+
+        function openQrModal() {
+            playSound('click');
+            document.getElementById('qrModal').classList.add('is-open');
+        }
+
+        function closeQrModal() {
+            playSound('click');
+            document.getElementById('qrModal').classList.remove('is-open');
+        }
+
+        function shareResult() {
+            playSound('click');
+            const title = document.getElementById('resultCardTitle').innerText;
+            const score = document.getElementById('resultScoreText').innerText;
+            const shareText = `[2026 남이섬 교직원 연수 결과]\n내 결과: ${title}\n달성/지수: ${score}\n\n선생님도 재미있게 즐겨보세요!🍁`;
+
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(shareText).then(() => {
+                    showToast('결과가 클립보드에 복사되었습니다! 카카오톡 단톡방에 붙여넣으세요.');
+                }).catch(() => {
+                    copyFallback(shareText);
+                });
+            } else {
+                copyFallback(shareText);
+            }
+        }
+
+        function copyFallback(text) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                showToast('결과가 클립보드에 복사되었습니다!');
+            } catch (err) {
+                showToast('결과 화면을 직접 캡처해 공유해보세요!');
+            }
+            document.body.removeChild(textArea);
+        }
+
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.className = 'fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-xs sm:text-sm px-4 py-2.5 rounded-xl shadow-xl z-50 font-bold modal-anim border border-slate-700';
+            toast.innerText = message;
+            document.body.appendChild(toast);
+            setTimeout(() => {
+                toast.remove();
+            }, 2500);
+        }
+    </script>
+</body>
+</html>
